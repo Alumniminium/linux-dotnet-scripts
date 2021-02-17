@@ -1,10 +1,11 @@
 #!/usr/bin/env dotnet-script
 
-#load "bspc.csx"
+#load "../io/formats/ini.csx"
+#load "../io/logger.csx"
+#load "../wrappers/bspc.csx"
 
 using System.IO;
 
-public static StreamWriter writer = new StreamWriter("/tmp/extenal_rules.log", true) { AutoFlush = true };
 
 public static bool ApplyRulesForFirst(string WM_CLASS, string WM_NAME, string WM_TYPE)
 {
@@ -28,25 +29,18 @@ public static bool ApplyRulesForFirst(string WM_CLASS, string WM_NAME, string WM
 
 public static bool LoadFile(string filename)
 {
-    var ignoredPrefixes = new[] { ' ','#', '/' };
-    var sectionDelimiters = new [] { '[',']'};
-    var ruleFile = Path.Combine(Environment.CurrentDirectory, ".config/bspwm/externalRules/rules/", filename);
-
-    writer.WriteLine("Trying " + ruleFile);
+    var ruleFile = Path.Combine("/home",Environment.UserName, ".config/bspwm/externalRules/rules/", filename);
+    logger.WriteLine("Trying " + ruleFile);
 
     if (File.Exists(ruleFile))
     {
-        writer.WriteLine("Found " + ruleFile);
+        logger.WriteLine("Found " + ruleFile);
+        var file = new ini(ruleFile);
 
-        var lines = File.ReadAllLines(ruleFile)
-                        .Where(l => !ignoredPrefixes.Any(p=> l.StartsWith(p)));
-                        
-        foreach (var line in lines)
-        {
-            var kvp = line.Split('=');
-            if (kvp.Length == 2)
-                Flags[kvp[0]] = kvp[1];
-        }
+        foreach (var section in file.contents)
+            foreach(var data in section.Value)
+                Flags[data.Key] = data.Value;
+        
         return true;
     }
     return false;
@@ -54,24 +48,24 @@ public static bool LoadFile(string filename)
 
 public static void PrintDebugInfo(IList<string> Args, string WM_CLASS, string WM_NAME, string WM_TYPE)
 {
-    writer.WriteLine();
-    writer.WriteLine("###### Debug Info Start");
+    logger.WriteLine();
+    logger.WriteLine("###### Debug Info Start");
     
-    writer.Write("Args:");
+    logger.Write("Args:");
     for (int i = 0; i < Args.Count - 1; i++)
-        writer.Write($" {Args[i]}");
-    writer.WriteLine();
+        logger.Write($" {Args[i]}");
+    logger.WriteLine();
 
-    writer.WriteLine("WM_TYPE: " + WM_TYPE);
-    writer.WriteLine("WM_CLASS: " + WM_CLASS);
-    writer.WriteLine("WM_NAME: " + WM_NAME);
-    writer.WriteLine();
+    logger.WriteLine("WM_TYPE: " + WM_TYPE);
+    logger.WriteLine("WM_CLASS: " + WM_CLASS);
+    logger.WriteLine("WM_NAME: " + WM_NAME);
+    logger.WriteLine();
 
-    writer.Write("Flags:");
+    logger.Write("Flags:");
     foreach (var flag in Flags.Where(flag=>!string.IsNullOrEmpty(flag.Value)))
-        writer.Write($" {flag.Key}={flag.Value}");
-    writer.WriteLine();
+        logger.Write($" {flag.Key}={flag.Value}");
+    logger.WriteLine();
 
-    writer.WriteLine("###### Debug Info End");
-    writer.WriteLine();
+    logger.WriteLine("###### Debug Info End");
+    logger.WriteLine();
 }

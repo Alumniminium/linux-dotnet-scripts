@@ -33,7 +33,7 @@ public static void SelectBiggestNode() => Flags["node"] = "@/";
 
 public static Dictionary<string, string> ParseFlags(string line)
 {
-    var pairs = line.Split(' ', StringSplitOptions.TrimEntries);
+    var pairs = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
     var flags = new Dictionary<string, string>();
 
     foreach (var pair in pairs)
