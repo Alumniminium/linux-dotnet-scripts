@@ -2,15 +2,17 @@
 
 public class ini
 {
-    public static char[] ignoredPrefixes = new[] { ' ', '#', '/' };
+    public static char[] ignoredPrefixes = new[] { '-', '#', '/' };
     private bool _loaded;
     public string filename;
     public Dictionary<string, Dictionary<string, string>> contents;
 
-    public ini(string FileName)
+    public ini(string FileName,bool preload = false)
     {
         filename = FileName;
         contents = new();
+        if(preload)
+            load();
     }
 
     public void load()
@@ -21,6 +23,9 @@ public class ini
         {
             var line = reader.ReadLine();
 
+            if(string.IsNullOrEmpty(line))
+                continue;
+
             if (ignoredPrefixes.Any(p => line.StartsWith(p)))
                 continue;
 
@@ -29,6 +34,7 @@ public class ini
                 var name = line.Replace("[", "").Replace("]", "");
                 contents.TryAdd(name, new());
                 section = name;
+                Console.WriteLine("Found new Section: " + section);
                 continue;
             }
 
@@ -40,10 +46,11 @@ public class ini
                 contents[section].TryAdd(kvp[0], kvp[1]);
             else
                 val = kvp[1];
+            Console.WriteLine(line);
         }
         _loaded = true;
     }
-    public bool tryget(string section, string key, out string val)
+    public bool tryGet(string section, string key, out string val)
     {
         if (!_loaded)
             load();
