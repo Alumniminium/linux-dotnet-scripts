@@ -22,7 +22,7 @@ public class ini
         while (!reader.EndOfStream)
         {
             var line = reader.ReadLine();
-
+            
             if(string.IsNullOrEmpty(line))
                 continue;
 
@@ -34,7 +34,6 @@ public class ini
                 var name = line.Replace("[", "").Replace("]", "");
                 contents.TryAdd(name, new());
                 section = name;
-                Console.WriteLine("Found new Section: " + section);
                 continue;
             }
 
@@ -45,8 +44,7 @@ public class ini
             if (!contents[section].TryGetValue(kvp[0], out var val))
                 contents[section].TryAdd(kvp[0], kvp[1]);
             else
-                val = kvp[1];
-            Console.WriteLine(line);
+                contents[section][kvp[0]] = kvp[1];
         }
         _loaded = true;
     }
