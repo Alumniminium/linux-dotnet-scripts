@@ -1,20 +1,13 @@
 #!/usr/bin/env dotnet-script
 
-#r "nuget: CliWrap, 3.3.0"
-
-using CliWrap;
-using CliWrap.Buffered;
+#load "shell.csx"
 
 public static class xprop
 {
     public static async Task<(string WM_CLASS, string WM_NAME, string WM_WINDOW_TYPE)> getWindowInfoById(string windowId)
     {
-        var cmd = await Cli.Wrap("xprop")
-                        .WithArguments($"-id {windowId} _NET_WM_WINDOW_TYPE WM_NAME WM_CLASS")
-                        .WithValidation(CommandResultValidation.None)
-                        .ExecuteBufferedAsync();
-
-        var lines = cmd.StandardOutput.Split(Environment.NewLine);
+        var output = await shell.runAsync($"xprop -id {windowId} _NET_WM_WINDOW_TYPE WM_NAME WM_CLASS");
+        var lines = output.Split(Environment.NewLine);
         var WM_WINDOW_TYPE = ParseType(lines).ToUpperInvariant();
         var WM_NAME = ParseName(lines).ToLowerInvariant();
         var WM_CLASS = ParseClass(lines).ToLowerInvariant();

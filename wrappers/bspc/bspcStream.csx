@@ -1,11 +1,6 @@
 #!/usr/bin/env dotnet-script
 
-#r "nuget: CliWrap, 3.3.0"
-
-using CliWrap;
-using CliWrap.Buffered;
-
-public static class bspc
+public static class bspcStream
 {
     public static Dictionary<string, string> Flags = new Dictionary<string,string>()
     {
@@ -87,80 +82,4 @@ public static class bspc
         Console.WriteLine(stdo);
     }
 }
-public class bspcRule
-{
-    public Dictionary<string, string> Flags = new Dictionary<string,string>()
-    {
-        ["monitor"] ="",
-        ["desktop"] ="",
-        ["node"] ="",
-        ["layer"] ="",
-        ["split_dir"] ="",
-        ["state"] ="",
-        ["split_ratio"] ="0",
-        ["hidden"] ="",
-        ["sticky"] ="",
-        ["private"] ="",
-        ["locked"] ="",
-        ["marked"] ="",
-        ["center"] ="",
-        ["follow"] ="",
-        ["manage"] ="",
-        ["focus"] ="",
-        ["border"] ="",
-        ["rectangle"] =""
-    };
-    public bspcRule Floating(bool val=true)
-    {
-        Flags["state"] = val ? "floating" : "tiled";
-        return this;
-    }
-    public bspcRule Tiled(bool val=true)
-    {
-        Flags["state"] = val ? "tiled" : "floating";
-        return this;
-    }
-    public bspcRule Centered(bool val=true)
-    {
-        Flags["center"] = val ? "on" : "off";
-        return this;
-    }
-    public bspcRule SplitRatio(float val)
-    {
-        Flags["split_ratio"] = val.ToString();
-        return this;
-    }
-    public bspcRule SplitDirection(string val)
-    {
-        Flags["split_dir"] = val;
-        return this;
-    }
-    public bspcRule Size(int w, int h, int x = 0, int y = 0) {
-         Flags["rectangle"] = $"{w}x{h}+{x}+{y}";
-        return this;
-    }
-    public bspcRule SizeInverted(int w, int h, int x = 0, int y = 0) {
-        Flags["rectangle"] = $"{w}x{h}-{x}-{y}";
-        return this;
-    }
-    public bspcRule SelectBiggestNode() {
-         Flags["node"] = "@/";
-        return this;
-        }
-    public string target;
 
-    public bspcRule(string Target) => new bspcRule(Target); 
-    public async void Apply()
-    {
-        var rules = string.Empty;
-        foreach(var kvp in Flags)
-            rules += $"{kvp.Key}={kvp.Value} ";
-        rules = rules.Trim();
-
-        var cmd = await Cli.Wrap("bspc")
-                           .WithArguments($"rule -a {target} {rules}")
-                           .WithValidation(CommandResultValidation.None)
-                           .ExecuteBufferedAsync(); 
-    }
-    
-}
