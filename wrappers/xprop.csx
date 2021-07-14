@@ -4,9 +4,9 @@
 
 public static class xprop
 {
-    public static async Task<(string WM_CLASS, string WM_NAME, string WM_WINDOW_TYPE)> getWindowInfoById(string windowId)
+    public static (string WM_CLASS, string WM_NAME, string WM_WINDOW_TYPE) getWindowInfoById(string windowId)
     {
-        var output = await shell.runAsync($"xprop -id {windowId} _NET_WM_WINDOW_TYPE WM_NAME WM_CLASS");
+        var output = shell.run2("xprop", $"-id {windowId} _NET_WM_WINDOW_TYPE WM_NAME WM_CLASS");
         var lines = output.Split(Environment.NewLine);
         var WM_WINDOW_TYPE = ParseType(lines).ToUpperInvariant();
         var WM_NAME = ParseName(lines).ToLowerInvariant();

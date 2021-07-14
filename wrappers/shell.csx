@@ -1,35 +1,25 @@
 #!/usr/bin/env dotnet-script
-#r "nuget: CliWrap, 3.3.0"
-
-using CliWrap;
-using CliWrap.Buffered;
 
 public static class shell
 {
-    public static string run(string command)
+    public static string run2(string command, string args = "", bool useShell = false, bool background = false)
     {
-        var parts = command.Split(' ',StringSplitOptions.RemoveEmptyEntries);
-        var cmd = Cli.Wrap(parts[0])
-                     .WithArguments(parts[1..])
-                     .WithValidation(CommandResultValidation.None)
-                     .ExecuteBufferedAsync()
-                     .GetAwaiter()
-                     .GetResult();
-        if(string.IsNullOrEmpty(cmd.StandardOutput))
-            return cmd.StandardError;
+        ProcessStartInfo info;
+        info = new ProcessStartInfo(command, args);
+        info.EnvironmentVariables["DISPLAY"] = ":0";
+        info.UseShellExecute = useShell;
 
-        return cmd.StandardOutput;
-    }
-    public static async Task<string> runAsync(string command)
-    {
-        var parts = command.Split(' ',StringSplitOptions.RemoveEmptyEntries);
-        var cmd = await Cli.Wrap(parts[0])
-                     .WithArguments(parts[1..])
-                     .WithValidation(CommandResultValidation.None)
-                     .ExecuteBufferedAsync();
-        if(string.IsNullOrEmpty(cmd.StandardOutput))
-            return cmd.StandardError;
+        info.RedirectStandardError = !background;
+        info.RedirectStandardOutput = !background;
 
-        return cmd.StandardOutput;
+        var process = Process.Start(info);
+
+        if (background)
+            return string.Empty;
+
+        var error = process.StandardError.ReadToEnd();
+        var output = process.StandardOutput.ReadToEnd();
+
+        return $"StdOut: {output}{Environment.NewLine}StdErr: {error}";
     }
 }

@@ -2,7 +2,7 @@
 
 public static class bspcStream
 {
-    public static Dictionary<string, string> Flags = new Dictionary<string,string>()
+    public static Dictionary<string, string> Flags = new()
     {
         ["monitor"] ="",
         ["desktop"] ="",
@@ -79,7 +79,7 @@ public static class bspcStream
                 stdo += $"{flag.Key}={flag.Value} ";
 
         stdo.Trim();
-        Console.WriteLine(stdo);
+        WriteLine(stdo);
     }
 }
 

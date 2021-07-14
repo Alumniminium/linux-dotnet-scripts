@@ -4,7 +4,7 @@
 
 public class bspcRule
 {
-    public Dictionary<string, string> Flags = new Dictionary<string,string>()
+    public Dictionary<string, string> Flags = new()
     {
         ["monitor"] ="",
         ["desktop"] ="",
@@ -91,6 +91,6 @@ public class bspcRule
             rules += $"{kvp.Key}={kvp.Value} ";
         rules = rules.Trim();
 
-        shell.run($"bspc rule -a {target} {rules}"); 
+        shell.run2("bspc",$"rule -a {target} {rules}"); 
     }    
 }
