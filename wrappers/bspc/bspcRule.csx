@@ -93,4 +93,12 @@ public class bspcRule
 
         shell.run2("bspc",$"rule -a {target} {rules}"); 
     }    
+
+    public override string ToString()
+    {
+        var lines = string.Empty;
+        foreach (var item in Flags)
+            lines += $"{item.Key}={item.Value}{Environment.NewLine}";
+        return lines;
+    }
 }

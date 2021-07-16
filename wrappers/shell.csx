@@ -20,6 +20,6 @@ public static class shell
         var error = process.StandardError.ReadToEnd();
         var output = process.StandardOutput.ReadToEnd();
 
-        return $"StdOut: {output}{Environment.NewLine}StdErr: {error}";
+        return $"StdOut: {Environment.NewLine}{output}{Environment.NewLine}{Environment.NewLine}StdErr: {Environment.NewLine}{error}";
     }
 }
